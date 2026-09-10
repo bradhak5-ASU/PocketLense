@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -17,6 +17,7 @@ import { Dashboard, currentMonth } from '../../models';
 })
 export class DashboardPage implements OnInit {
     private api = inject(ApiService);
+    private changeDetector = inject(ChangeDetectorRef);
     month = currentMonth();
     data: Dashboard | null = null;
     error = '';
@@ -152,6 +153,7 @@ export class DashboardPage implements OnInit {
             this.error = this.api.error(error);
         } finally {
             this.busy = false;
+            this.changeDetector.detectChanges();
         }
     }
 
