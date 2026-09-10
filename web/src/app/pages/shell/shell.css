@@ -6,20 +6,21 @@
     width: 238px;
     flex-shrink: 0;
     padding: 32px 20px 24px;
-    background: white;
+    background: var(--panel);
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
     position: sticky;
     top: 0;
     height: 100dvh;
+    overflow-y: auto;
 }
 .brand {
     padding: 0 8px;
     font-size: 21px;
 }
 .nav-label {
-    color: #9aa2ae;
+    color: var(--muted);
     font-size: 10px;
     font-weight: 600;
     letter-spacing: 1.7px;
@@ -34,17 +35,17 @@ nav a {
     display: flex;
     align-items: center;
     gap: 12px;
-    color: #657085;
+    color: var(--nav-text);
     font-size: 13px;
     border-radius: 5px;
     font-weight: 500;
 }
 nav a:hover {
-    background: #f5f7fb;
+    background: var(--soft);
 }
 nav a.active {
-    background: #edf3ff;
-    color: #326dde;
+    background: var(--soft-blue);
+    color: var(--blue);
 }
 .nav-icon {
     font-size: 21px;
@@ -74,8 +75,8 @@ nav a.active {
     margin-top: 5px;
 }
 .avatar {
-    background: #eff3f9;
-    color: #59749d;
+    background: var(--soft);
+    color: var(--nav-text);
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -98,20 +99,20 @@ nav a.active {
 }
 .topbar {
     height: 68px;
-    background: white;
+    background: var(--panel);
     border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 40px;
-    color: #637084;
+    color: var(--nav-text);
     font-size: 12px;
 }
 .private-label {
     display: flex;
     align-items: center;
     gap: 7px;
-    color: #929aa7;
+    color: var(--muted);
     font-size: 11px;
 }
 .status-dot {
@@ -131,7 +132,7 @@ nav a.active {
     padding: 20px 40px;
     display: flex;
     justify-content: space-between;
-    color: #99a2af;
+    color: var(--muted);
     font-size: 11px;
 }
 @media (max-width: 1000px) {

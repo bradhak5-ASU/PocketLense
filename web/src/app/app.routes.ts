@@ -40,6 +40,11 @@ export const routes: Routes = [
                     import('./pages/subscriptions/subscriptions').then((m) => m.SubscriptionsPage),
             },
             {
+                path: 'assistant',
+                loadComponent: () =>
+                    import('./pages/assistant/assistant').then((m) => m.AssistantPage),
+            },
+            {
                 path: 'settings',
                 loadComponent: () =>
                     import('./pages/settings/settings').then((m) => m.SettingsPage),

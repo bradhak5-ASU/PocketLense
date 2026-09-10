@@ -1,6 +1,8 @@
 using PocketLense.Core.Models;
 using PocketLense.Core.Services;
 using PocketLense.Infrastructure.Services;
+using System.IO.Compression;
+using System.Text;
 
 namespace PocketLense.Tests.Unit;
 
@@ -57,6 +59,28 @@ public class FinanceTests
     }
 
     [Fact]
+    public void ExcelStatementsBecomeMappableRows()
+    {
+        using var stream = CreateExcel();
+        var statement = StatementFileReader.Read(stream, "statement.xlsx");
+        var preview = CsvImportService.Parse(statement.Text, Guid.NewGuid(),
+            new CsvMapping("Date", "yyyy-MM-dd", "Description", "Amount", null, null, false), statement.Source);
+
+        var item = Assert.Single(preview.Transactions);
+        Assert.Equal("Excel", item.Source);
+        Assert.Equal("Coffee shop", item.Description);
+        Assert.Equal(-4.50m, item.Amount);
+    }
+
+    [Fact]
+    public void AScannedPdfGetsAClearError()
+    {
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes("This is not a readable PDF"));
+        var error = Assert.Throws<AppException>(() => StatementFileReader.Read(stream, "statement.pdf"));
+        Assert.Contains("PDF", error.Message);
+    }
+
+    [Fact]
     public void IdenticalPurchasesKeepSeparateRepeatableHashes()
     {
         var mapping = new CsvMapping("Date", "yyyy-MM-dd", "Description", "Amount", null, null, false);
@@ -104,4 +128,54 @@ public class FinanceTests
     }
 
     private static Transaction Charge(string description, DateOnly date, decimal amount) => new() { Description = description, Date = date, Amount = -amount, UserId = "test" };
+
+    private static MemoryStream CreateExcel()
+    {
+        var stream = new MemoryStream();
+        using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, true))
+        {
+            AddFile(archive, "[Content_Types].xml", """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+                  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+                  <Default Extension="xml" ContentType="application/xml"/>
+                  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+                  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+                </Types>
+                """);
+            AddFile(archive, "_rels/.rels", """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+                  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+                </Relationships>
+                """);
+            AddFile(archive, "xl/workbook.xml", """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+                  <sheets><sheet name="Transactions" sheetId="1" r:id="rId1"/></sheets>
+                </workbook>
+                """);
+            AddFile(archive, "xl/_rels/workbook.xml.rels", """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+                  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+                </Relationships>
+                """);
+            AddFile(archive, "xl/worksheets/sheet1.xml", """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>
+                  <row r="1"><c r="A1" t="inlineStr"><is><t>Date</t></is></c><c r="B1" t="inlineStr"><is><t>Description</t></is></c><c r="C1" t="inlineStr"><is><t>Amount</t></is></c></row>
+                  <row r="2"><c r="A2" t="inlineStr"><is><t>2026-09-01</t></is></c><c r="B2" t="inlineStr"><is><t>Coffee shop</t></is></c><c r="C2"><v>-4.50</v></c></row>
+                </sheetData></worksheet>
+                """);
+        }
+        stream.Position = 0;
+        return stream;
+    }
+
+    private static void AddFile(ZipArchive archive, string name, string contents)
+    {
+        using var writer = new StreamWriter(archive.CreateEntry(name).Open());
+        writer.Write(contents);
+    }
 }

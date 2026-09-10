@@ -8,6 +8,6 @@ Keep the code straightforward and easy to explain.
 - Avoid extra layers, clever shortcuts, and unnecessary dependencies.
 - Add comments only when the reason is not obvious. First-person explanations are welcome when useful.
 - Preserve validation, authentication, and user isolation even when simplifying code.
-- Keep the white-card login, light-gray background, blue buttons, and full-page tracker layout.
+- Keep the white-card login, blue buttons, and full-page tracker layout. Preserve Light, Night Blue, and Lights Out themes.
 - Read PROJECT_SPEC.md for feature requirements and README.md for documented implementation choices.
 - Never commit secrets or generated demo credentials.

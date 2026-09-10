@@ -9,10 +9,10 @@
 .login-card {
     width: 100%;
     max-width: 430px;
-    background: white;
+    background: var(--panel);
     padding: 44px 40px 34px;
-    border: 1px solid #e8ebf0;
-    box-shadow: 0 8px 35px #2437540d;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 35px var(--shadow);
 }
 .brand {
     justify-content: center;

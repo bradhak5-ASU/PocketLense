@@ -16,6 +16,42 @@
     <p class="success">{{ message }}</p>
 }
 <section class="panel">
+    <h2>Appearance</h2>
+    <p class="hint">Choose how PocketLense looks on this device.</p>
+    <div class="theme-options">
+        <button
+            type="button"
+            class="theme-choice light-choice"
+            [class.selected]="theme.theme === 'light'"
+            (click)="setTheme('light')"
+        >
+            <span class="theme-preview"><i></i><i></i><i></i></span>
+            <strong>Light</strong>
+            <small>Clean and bright</small>
+        </button>
+        <button
+            type="button"
+            class="theme-choice dim-choice"
+            [class.selected]="theme.theme === 'dim'"
+            (click)="setTheme('dim')"
+        >
+            <span class="theme-preview"><i></i><i></i><i></i></span>
+            <strong>Night blue</strong>
+            <small>Deep blue, like X Dim</small>
+        </button>
+        <button
+            type="button"
+            class="theme-choice black-choice"
+            [class.selected]="theme.theme === 'black'"
+            (click)="setTheme('black')"
+        >
+            <span class="theme-preview"><i></i><i></i><i></i></span>
+            <strong>Lights out</strong>
+            <small>True black</small>
+        </button>
+    </div>
+</section>
+<section class="panel">
     <h2>Accounts</h2>
     <div class="table-wrap">
         <table>
@@ -275,8 +311,14 @@
 </section>
 <section class="panel">
     <h2>Connected sources</h2>
-    <p class="hint">CSV import and manual entry are available now.</p>
+    <p class="hint">Manual entry, CSV, Excel, and text-based PDF statements are available now.</p>
     <div class="form-actions">
+        <a
+            mat-stroked-button
+            routerLink="/import"
+        >
+            Import a statement
+        </a>
         <button
             mat-stroked-button
             disabled

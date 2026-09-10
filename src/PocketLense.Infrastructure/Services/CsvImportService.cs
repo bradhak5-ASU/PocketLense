@@ -68,7 +68,7 @@ public class CsvImportService(AppDbContext db, FinanceService finance)
             throw new AppException(400, "Each CSV column needs a unique, non-empty header.");
     }
 
-    public static ParsedCsv Parse(string text, Guid accountId, CsvMapping mapping)
+    public static ParsedCsv Parse(string text, Guid accountId, CsvMapping mapping, string source = "Csv")
     {
         var transactions = new List<Transaction>();
         var errors = new List<ImportError>();
@@ -115,7 +115,7 @@ public class CsvImportService(AppDbContext db, FinanceService finance)
                     string key = ImportIdentity.Create(accountId, date, amount, description, 0);
                     int occurrence = occurrences.GetValueOrDefault(key);
                     occurrences[key] = occurrence + 1;
-                    transactions.Add(new Transaction { AccountId = accountId, Date = date, Description = description, Amount = amount, Source = "Csv", ImportHash = ImportIdentity.Create(accountId, date, amount, description, occurrence) });
+                    transactions.Add(new Transaction { AccountId = accountId, Date = date, Description = description, Amount = amount, Source = source, ImportHash = ImportIdentity.Create(accountId, date, amount, description, occurrence) });
                 }
                 catch (Exception ex) when (ex is FormatException or CsvHelperException or OverflowException)
                 {
@@ -136,11 +136,11 @@ public class CsvImportService(AppDbContext db, FinanceService finance)
         return amount;
     }
 
-    public async Task<ImportResult> Commit(string userId, Guid accountId, string text, CsvMapping mapping)
+    public async Task<ImportResult> Commit(string userId, Guid accountId, string text, CsvMapping mapping, string source = "Csv")
     {
         if (!await db.Accounts.AnyAsync(a => a.UserId == userId && a.Id == accountId))
             throw new AppException(404, "Account not found.");
-        var parsed = Parse(text, accountId, mapping);
+        var parsed = Parse(text, accountId, mapping, source);
         if (parsed.Errors.Count > 0)
             return new(0, 0, parsed.Errors);
         await using var transaction = await db.Database.BeginTransactionAsync();

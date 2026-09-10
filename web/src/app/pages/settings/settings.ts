@@ -2,16 +2,20 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { Account, Category, Rule } from '../../models';
+import { AppTheme, ThemeService } from '../../services/theme.service';
 
 @Component({
     selector: 'app-settings',
-    imports: [CommonModule, FormsModule, MatButtonModule],
+    imports: [CommonModule, FormsModule, MatButtonModule, RouterLink],
     templateUrl: './settings.html',
+    styleUrl: './settings.css',
 })
 export class SettingsPage implements OnInit {
     private api = inject(ApiService);
+    theme = inject(ThemeService);
     accounts: Account[] = [];
     categories: Category[] = [];
     rules: Rule[] = [];
@@ -23,6 +27,9 @@ export class SettingsPage implements OnInit {
     error = '';
     message = '';
     busy = false;
+    setTheme(theme: AppTheme): void {
+        this.theme.setTheme(theme);
+    }
     ngOnInit(): void {
         void this.load();
     }

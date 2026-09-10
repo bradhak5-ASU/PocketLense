@@ -110,9 +110,10 @@ Unique index on `(UserId, ImportHash)` where `ImportHash` is not null. Unique in
 - Amount of `0` or a missing date/description returns 400.
 - A manually added `-12.50` "UBER TRIP" with a rule `UBER → Transport` is saved with category Transport.
 
-### F4. CSV Statement Import
+### F4. Statement Import
 
 **Requirements**
+- Accept CSV, Excel (`.xls` and `.xlsx`), and text-based PDF statements. Scanned PDFs are not supported yet.
 - Two-step flow:
   1. `POST /api/imports/preview` — upload CSV (max 5 MB). Returns detected headers and the first 20 rows.
   2. `POST /api/imports/commit` — same file plus a column mapping and target account.
@@ -262,7 +263,7 @@ All endpoints except auth require a valid JWT.
 | Login / Register | Forms with validation messages |
 | Dashboard | Summary cards, three charts, upcoming bills, Ask PocketLense panel (if enabled) |
 | Transactions | Filterable, paginated table; add/edit dialog; inline category change with "create rule?" prompt |
-| Import | Upload → preview table → column mapping → result summary |
+| Import | CSV / Excel / PDF upload → preview table → column mapping → result summary |
 | Budgets | Month picker, progress bars, set limits, copy previous month |
 | Subscriptions | Detected (confirm/dismiss), confirmed list, upcoming renewals, monthly/annual totals, price-increase badges |
 | Settings | Accounts, categories, rules, connected sources (disabled email button) |

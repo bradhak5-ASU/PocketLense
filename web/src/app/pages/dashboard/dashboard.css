@@ -19,8 +19,8 @@
 .bill-icon {
     width: 36px;
     height: 36px;
-    background: #f0f4fb;
-    color: #7891b9;
+    background: var(--soft);
+    color: var(--nav-text);
     display: grid;
     place-items: center;
     border-radius: 7px;

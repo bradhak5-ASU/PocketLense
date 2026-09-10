@@ -134,6 +134,11 @@
           "Docker.DotNet.Enhanced.Handler.Abstractions": "4.3.3"
         }
       },
+      "ExcelDataReader": {
+        "type": "Transitive",
+        "resolved": "3.9.0",
+        "contentHash": "3lEkUzG67UWPYj/xlX5Hua3MeQQktnK0B7WGzDjLpdJpBtct7szX0E4WB3Kl6C/8bNnbkyT2eO0FSPV+9CCemw=="
+      },
       "Microsoft.AspNetCore.Authentication.JwtBearer": {
         "type": "Transitive",
         "resolved": "10.0.9",
@@ -631,6 +636,11 @@
           "Npgsql": "10.0.3"
         }
       },
+      "PdfPig": {
+        "type": "Transitive",
+        "resolved": "0.1.16",
+        "contentHash": "qQcbsNMYVY+K5ELptax2S8thNMk0+rSQq3H/KdYj3LLcko8yTCz8y5KIvsKxIyAuTN0ZYNnfsZkM+0EvxTwHVA=="
+      },
       "SharpZipLib": {
         "type": "Transitive",
         "resolved": "1.4.2",
@@ -732,8 +742,10 @@
         "type": "Project",
         "dependencies": {
           "CsvHelper": "[33.1.0, )",
+          "ExcelDataReader": "[3.9.0, )",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "[10.0.9, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
+          "PdfPig": "[0.1.16, )",
           "PocketLense.Core": "[1.0.0, )"
         }
       }

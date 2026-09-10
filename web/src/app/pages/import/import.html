@@ -1,7 +1,7 @@
 <div class="page-heading">
     <div>
         <h1>Import a statement</h1>
-        <p>Bring your bank transactions into PocketLense.</p>
+        <p>Bring in transactions from a CSV, Excel, or PDF statement.</p>
     </div>
     <a
         mat-stroked-button
@@ -18,8 +18,10 @@
     </p>
 }
 <section class="panel">
-    <h2>1. Choose your CSV</h2>
-    <p class="hint">Export a CSV statement from your bank. Maximum file size: 5 MB.</p>
+    <h2>1. Choose your statement</h2>
+    <p class="hint">
+        Use CSV, Excel (.xls or .xlsx), or a text-based PDF. Maximum file size: 5 MB.
+    </p>
     <div
         class="form-grid"
         style="margin-top: 20px"
@@ -27,7 +29,7 @@
         <label class="form-field"
             >Statement file<input
                 type="file"
-                accept=".csv,text/csv"
+                accept=".csv,.xls,.xlsx,.pdf,text/csv,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 (change)="choose($event)" /></label
         ><label class="form-field"
             >Import into<select [(ngModel)]="accountId">
@@ -51,6 +53,12 @@
     <section class="panel">
         <h2>2. Match the columns</h2>
         <p class="hint">Choose which columns contain your date, description, and amounts.</p>
+        @if (fileType === 'PDF') {
+            <p class="hint">
+                PocketLense found transaction-like rows in the PDF. Check the preview before
+                importing.
+            </p>
+        }
         <form
             #form="ngForm"
             (ngSubmit)="commit()"

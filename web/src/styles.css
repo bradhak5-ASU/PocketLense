@@ -6,13 +6,67 @@
     --border: #e8ecf2;
     --green: #21865e;
     --red: #d5504c;
+    --page: #f6f8fb;
+    --panel: #ffffff;
+    --input: #ffffff;
+    --soft: #fafbfd;
+    --soft-blue: #edf3ff;
+    --nav-text: #657085;
+    --heading: #27344c;
+    --focus: #aec9fb;
+    --error-bg: #fff1f0;
+    --success-bg: #edf8f2;
+    --shadow: #2437540d;
+    color-scheme: light;
+}
+
+:root[data-theme='dim'] {
+    --blue: #1d9bf0;
+    --text: #e7edf3;
+    --muted: #8b98a5;
+    --border: #38444d;
+    --green: #57c58b;
+    --red: #f26d67;
+    --page: #15202b;
+    --panel: #192734;
+    --input: #22303c;
+    --soft: #1d2d3a;
+    --soft-blue: #223447;
+    --nav-text: #a9b7c4;
+    --heading: #f0f4f7;
+    --focus: #1d9bf055;
+    --error-bg: #4a2529;
+    --success-bg: #17392f;
+    --shadow: #00000028;
+    color-scheme: dark;
+}
+
+:root[data-theme='black'] {
+    --blue: #1d9bf0;
+    --text: #e7e9ea;
+    --muted: #71767b;
+    --border: #2f3336;
+    --green: #57c58b;
+    --red: #f26d67;
+    --page: #000000;
+    --panel: #0b0b0b;
+    --input: #16181c;
+    --soft: #111214;
+    --soft-blue: #162635;
+    --nav-text: #a5a9ad;
+    --heading: #f2f2f2;
+    --focus: #1d9bf055;
+    --error-bg: #3a1c20;
+    --success-bg: #102d25;
+    --shadow: #00000080;
+    color-scheme: dark;
 }
 * {
     box-sizing: border-box;
 }
 body {
     margin: 0;
-    background: #f6f8fb;
+    background: var(--page);
     color: var(--text);
     font-family: Arial, Helvetica, sans-serif;
     font-size: 14px;
@@ -68,24 +122,29 @@ button[mat-flat-button],
 a[mat-flat-button] {
     --mdc-filled-button-container-color: var(--blue);
 }
+button[mat-stroked-button],
+a[mat-stroked-button] {
+    color: var(--text);
+    border-color: var(--border);
+}
 input,
 select,
 textarea {
-    border: 1px solid #dce2eb;
+    border: 1px solid var(--border);
     border-radius: 4px;
     padding: 10px 12px;
     color: var(--text);
-    background: white;
+    background: var(--input);
     min-width: 0;
 }
 input:focus,
 select:focus,
 textarea:focus {
-    outline: 2px solid #aec9fb;
+    outline: 2px solid var(--focus);
     outline-offset: 1px;
 }
 input::placeholder {
-    color: #a2a9b5;
+    color: var(--muted);
 }
 label {
     font-size: 12px;
@@ -95,7 +154,7 @@ label {
     display: flex;
     align-items: center;
     gap: 9px;
-    color: #27344c;
+    color: var(--heading);
     font-size: 24px;
     font-weight: 600;
     letter-spacing: -0.7px;
@@ -111,7 +170,7 @@ label {
     height: 33px;
     background: var(--blue);
     border-radius: 6px;
-    color: white;
+    color: #ffffff;
     font-size: 21px;
     font-weight: 500;
 }
@@ -134,7 +193,7 @@ label {
     flex-wrap: wrap;
 }
 .panel {
-    background: white;
+    background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 24px;
@@ -161,13 +220,13 @@ label {
     margin-bottom: 24px;
 }
 .summary-card {
-    background: white;
+    background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 24px;
 }
 .summary-label {
-    color: #7a8596;
+    color: var(--muted);
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.7px;
@@ -205,21 +264,21 @@ label {
 }
 .empty strong {
     display: block;
-    color: #617088;
+    color: var(--nav-text);
     font-size: 14px;
     margin-bottom: 8px;
 }
 .error {
-    background: #fff1f0;
-    color: #b53834;
+    background: var(--error-bg);
+    color: var(--red);
     padding: 12px 15px;
     border-radius: 4px;
     line-height: 1.5;
     font-size: 13px;
 }
 .success {
-    background: #edf8f2;
-    color: #247c55;
+    background: var(--success-bg);
+    color: var(--green);
     padding: 12px 15px;
     border-radius: 4px;
     font-size: 13px;
@@ -265,16 +324,16 @@ th {
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    color: #8b95a5;
+    color: var(--muted);
     font-weight: 600;
     padding: 13px 12px;
-    background: #fafbfd;
+    background: var(--soft);
     border-bottom: 1px solid var(--border);
     white-space: nowrap;
 }
 td {
     padding: 17px 12px;
-    border-bottom: 1px solid #f0f2f6;
+    border-bottom: 1px solid var(--border);
     font-size: 12px;
 }
 tr:last-child td {
@@ -287,8 +346,8 @@ tr:last-child td {
     white-space: nowrap;
 }
 .badge {
-    background: #f1f4f9;
-    color: #6d7e98;
+    background: var(--soft);
+    color: var(--nav-text);
     border-radius: 4px;
     font-size: 10px;
     padding: 5px 8px;
@@ -314,7 +373,7 @@ tr:last-child td {
     font-size: 12px;
 }
 .danger {
-    color: #bf514c;
+    color: var(--red);
 }
 .pagination {
     display: flex;

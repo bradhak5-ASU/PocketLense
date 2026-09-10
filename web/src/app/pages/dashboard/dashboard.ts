@@ -45,11 +45,18 @@ export class DashboardPage implements OnInit {
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-            x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+            x: {
+                grid: { display: false },
+                ticks: { font: { size: 10 }, color: this.color('--muted') },
+            },
             y: {
                 beginAtZero: true,
-                ticks: { font: { size: 10 }, callback: (value) => '$' + value },
-                grid: { color: '#f0f2f6' },
+                ticks: {
+                    font: { size: 10 },
+                    color: this.color('--muted'),
+                    callback: (value) => '$' + value,
+                },
+                grid: { color: this.color('--border') },
             },
         },
     };
@@ -105,7 +112,7 @@ export class DashboardPage implements OnInit {
                             '#c5cbd5',
                         ],
                         borderWidth: 3,
-                        borderColor: '#ffffff',
+                        borderColor: this.color('--panel'),
                     },
                 ],
             };
@@ -146,5 +153,9 @@ export class DashboardPage implements OnInit {
         } finally {
             this.busy = false;
         }
+    }
+
+    private color(name: string): string {
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
     }
 }

@@ -17,6 +17,7 @@ export class Shell implements OnInit {
         { path: '/transactions', label: 'Transactions', icon: '⇄' },
         { path: '/budgets', label: 'Budgets', icon: '▤' },
         { path: '/subscriptions', label: 'Subscriptions', icon: '↻' },
+        { path: '/assistant', label: 'PocketLense Chat', icon: '✦' },
         { path: '/import', label: 'Import statement', icon: '↥' },
         { path: '/settings', label: 'Settings', icon: '⚙' },
     ];

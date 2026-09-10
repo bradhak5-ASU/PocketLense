@@ -1,0 +1,93 @@
+<div class="chat-page">
+    <header class="chat-heading">
+        <div>
+            <h1>PocketLense Chat</h1>
+            <p>Ask questions about your money in plain language.</p>
+        </div>
+        <div class="chat-actions">
+            <span class="preview-badge">Preview mode</span>
+            <button
+                mat-stroked-button
+                type="button"
+                (click)="clear()"
+            >
+                Clear chat
+            </button>
+        </div>
+    </header>
+
+    <section
+        class="chat-window"
+        aria-label="PocketLense conversation"
+    >
+        <div class="messages">
+            @for (message of messages; track $index) {
+                <article
+                    class="message"
+                    [class.user-message]="message.role === 'user'"
+                >
+                    <span class="message-icon">{{ message.role === 'user' ? 'You' : 'P' }}</span>
+                    <div>
+                        <strong>{{ message.role === 'user' ? 'You' : 'PocketLense' }}</strong>
+                        <p>{{ message.text }}</p>
+                    </div>
+                </article>
+            }
+            @if (busy) {
+                <article class="message">
+                    <span class="message-icon">P</span>
+                    <div>
+                        <strong>PocketLense</strong>
+                        <p class="thinking">Checking your budget data…</p>
+                    </div>
+                </article>
+            }
+            <div #chatEnd></div>
+        </div>
+
+        @if (messages.length === 1) {
+            <div class="suggestions">
+                @for (suggestion of suggestions; track suggestion) {
+                    <button
+                        type="button"
+                        (click)="useSuggestion(suggestion)"
+                    >
+                        {{ suggestion }}
+                    </button>
+                }
+            </div>
+        }
+
+        @if (error) {
+            <p
+                class="error"
+                role="alert"
+            >
+                {{ error }}
+            </p>
+        }
+
+        <form
+            #chatForm="ngForm"
+            class="chat-form"
+            (ngSubmit)="send()"
+        >
+            <textarea
+                name="question"
+                [(ngModel)]="question"
+                placeholder="Ask about spending, budgets, or recurring charges…"
+                aria-label="Message PocketLense"
+                rows="2"
+                maxlength="500"
+                required
+            ></textarea>
+            <button
+                mat-flat-button
+                [disabled]="chatForm.invalid || busy"
+            >
+                Send
+            </button>
+        </form>
+        <p class="chat-note">Preview answers use simple rules. Claude is not connected yet.</p>
+    </section>
+</div>

@@ -1,7 +1,7 @@
 # PocketLense
 
 A personal budgeting app built with Angular, ASP.NET Core, C#, and PostgreSQL.
-Import a bank CSV, organize transactions, set monthly budgets, and track recurring charges.
+Import CSV, Excel, and PDF statements, organize transactions, set monthly budgets, and track recurring charges.
 
 ## Run locally
 
@@ -79,13 +79,22 @@ The panel remains hidden when the key or model is missing. No real model calls a
 
 Only four aggregate reporting functions are exposed. User identity comes from the authenticated request; the model cannot modify data or request another user's records. Requests are limited to 20 per user per hour and five tool-call rounds.
 
+PocketLense Chat is available without an API key. Its preview mode uses simple rules and the same dashboard totals to answer a small set of budgeting questions. It clearly identifies itself as a preview. The existing assistant endpoint can replace this local response logic when Claude is enabled later.
+
+## Statement files
+
+- CSV and Excel files show their first worksheet or table so you can match columns before importing.
+- Text-based PDFs are scanned for rows that begin with a full date and end with an amount.
+- Scanned image PDFs, password-protected PDFs, and PDFs without a year in each transaction date need OCR or a bank-specific parser and are rejected with a clear message.
+- Always check the preview before committing an import because bank statement formats vary.
+
 ## Version-one choices
 
 - USD only. Expenses are negative; income is positive. Transfer categories never count toward spending or income.
 - Spending is gross expenses. Positive refunds do not reduce the spending total; categorize them under the original expense category to keep them out of income.
 - Credit-card payments between your own accounts belong in Transfers.
 - Copying budgets fills missing categories and preserves existing limits. Category replacement combines overlapping budget limits.
-- CSV imports reject the whole file for parsing errors. Reimporting the same statement skips its transactions. With overlapping exports, identical purchases are distinguished by their occurrence within each file; review ambiguous overlaps in Transactions.
+- Statement imports reject the whole file for parsing errors. Reimporting the same statement skips its transactions. With overlapping exports, identical purchases are distinguished by their occurrence within each file; review ambiguous overlaps in Transactions.
 - Subscription matches need confirmation. Projected renewals are estimates, not proof that a payment happened. Dismissed merchants are not suggested again.
 - JWT sessions last one hour. Refresh tokens, password reset, bank/email connections, PDF imports, and deployment are future work.
 

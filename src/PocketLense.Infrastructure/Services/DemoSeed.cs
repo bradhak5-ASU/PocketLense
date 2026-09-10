@@ -53,8 +53,8 @@ public static class DemoSeed
         await db.SaveChangesAsync();
         await services.GetRequiredService<FinanceService>().DetectSubscriptions(user.Id);
         foreach (var item in await db.Subscriptions.Where(s => s.UserId == user.Id).ToListAsync())
-        if (item.DisplayName is "Netflix" or "Spotify" or "City Gym")
-            item.Status = "Confirmed";
+            if (item.DisplayName is "Netflix" or "Spotify" or "City Gym")
+                item.Status = "Confirmed";
         await db.SaveChangesAsync();
         await transaction.CommitAsync();
     }

@@ -22,6 +22,7 @@ export class ImportPage implements OnInit {
     busy = false;
     error = '';
     result: ImportResult | null = null;
+    fileType = '';
     amountMode = 'single';
     mapping = {
         dateColumn: '',
@@ -46,8 +47,15 @@ export class ImportPage implements OnInit {
         this.rows = [];
         this.result = null;
         this.error = '';
+        this.fileType = this.file?.name.split('.').pop()?.toUpperCase() || '';
         if (this.file && this.file.size > 5 * 1024 * 1024) {
-            this.error = 'Choose a CSV smaller than 5 MB.';
+            this.error = 'Choose a statement smaller than 5 MB.';
+            this.file = null;
+            return;
+        }
+        const allowed = ['CSV', 'XLS', 'XLSX', 'PDF'];
+        if (this.file && !allowed.includes(this.fileType)) {
+            this.error = 'Choose a CSV, Excel, or PDF statement.';
             this.file = null;
         }
     }
@@ -72,6 +80,7 @@ export class ImportPage implements OnInit {
             this.mapping.amountColumn = find('amount');
             this.mapping.debitColumn = find('debit');
             this.mapping.creditColumn = find('credit');
+            if (this.fileType === 'PDF') this.mapping.dateFormat = 'yyyy-MM-dd';
         } catch (error) {
             this.error = this.api.error(error);
         } finally {
