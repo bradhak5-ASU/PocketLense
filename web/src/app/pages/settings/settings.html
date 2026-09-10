@@ -1,0 +1,287 @@
+<div class="page-heading">
+    <div>
+        <h1>Settings</h1>
+        <p>Make PocketLense work for your accounts and habits.</p>
+    </div>
+</div>
+@if (error) {
+    <p
+        class="error"
+        role="alert"
+    >
+        {{ error }}
+    </p>
+}
+@if (message) {
+    <p class="success">{{ message }}</p>
+}
+<section class="panel">
+    <h2>Accounts</h2>
+    <div class="table-wrap">
+        <table>
+            <tbody>
+                @for (item of accounts; track item.id) {
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.type }}</td>
+                        <td>
+                            <button
+                                class="text-button"
+                                (click)="
+                                    account = { id: item.id, name: item.name, type: item.type }
+                                "
+                            >
+                                Edit</button
+                            ><button
+                                class="text-button danger"
+                                [disabled]="busy"
+                                (click)="remove('accounts/' + item.id)"
+                            >
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <form
+        #accountForm="ngForm"
+        (ngSubmit)="saveAccount()"
+        class="filters"
+        style="margin-top: 20px"
+    >
+        <input
+            name="name"
+            aria-label="Account name"
+            placeholder="Account name"
+            [(ngModel)]="account.name"
+            required
+            maxlength="100"
+        /><select
+            name="type"
+            aria-label="Account type"
+            [(ngModel)]="account.type"
+        >
+            <option>Checking</option>
+            <option>Credit</option>
+            <option>Savings</option></select
+        ><button
+            mat-flat-button
+            [disabled]="accountForm.invalid || busy"
+        >
+            {{ account.id ? 'Update account' : 'Add account' }}
+        </button>
+        @if (account.id) {
+            <button
+                mat-stroked-button
+                type="button"
+                (click)="account = { id: '', name: '', type: 'Checking' }"
+            >
+                Cancel
+            </button>
+        }
+    </form>
+    <p class="hint">Accounts with transactions cannot be deleted.</p>
+</section>
+<section class="panel">
+    <h2>Categories</h2>
+    <div class="table-wrap">
+        <table>
+            <tbody>
+                @for (item of categories; track item.id) {
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>
+                            <span class="badge">{{ item.kind }}</span>
+                        </td>
+                        <td>
+                            <button
+                                class="text-button"
+                                (click)="
+                                    category = { id: item.id, name: item.name, kind: item.kind }
+                                "
+                            >
+                                Edit</button
+                            ><button
+                                class="text-button danger"
+                                (click)="deleting = item; replacementId = ''"
+                            >
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <form
+        #categoryForm="ngForm"
+        (ngSubmit)="saveCategory()"
+        class="filters"
+        style="margin-top: 20px"
+    >
+        <input
+            name="name"
+            aria-label="Category name"
+            placeholder="Category name"
+            [(ngModel)]="category.name"
+            required
+            maxlength="100"
+        /><select
+            name="kind"
+            aria-label="Category kind"
+            [(ngModel)]="category.kind"
+        >
+            <option>Expense</option>
+            <option>Income</option>
+            <option>Transfer</option></select
+        ><button
+            mat-flat-button
+            [disabled]="categoryForm.invalid || busy"
+        >
+            {{ category.id ? 'Update category' : 'Add category' }}
+        </button>
+        @if (category.id) {
+            <button
+                mat-stroked-button
+                type="button"
+                (click)="category = { id: '', name: '', kind: 'Expense' }"
+            >
+                Cancel
+            </button>
+        }
+    </form>
+    @if (deleting) {
+        <div class="panel">
+            <h3>Delete {{ deleting.name }}?</h3>
+            <p class="hint">
+                If this category is in use, choose a replacement. Transactions and rules move to it;
+                overlapping budget limits are added together.
+            </p>
+            <select
+                aria-label="Replacement category"
+                [(ngModel)]="replacementId"
+            >
+                <option value="">No replacement (unused categories only)</option>
+                @for (item of categories; track item.id) {
+                    @if (item.id !== deleting.id && item.kind === deleting.kind) {
+                        <option [value]="item.id">{{ item.name }}</option>
+                    }
+                }
+            </select>
+            <div class="form-actions">
+                <button
+                    mat-flat-button
+                    [disabled]="busy"
+                    (click)="removeCategory()"
+                >
+                    Delete category</button
+                ><button
+                    mat-stroked-button
+                    (click)="deleting = null"
+                >
+                    Cancel
+                </button>
+            </div>
+        </div>
+    }
+</section>
+<section class="panel">
+    <div class="panel-heading">
+        <div>
+            <h2>Category rules</h2>
+            <p>
+                Descriptions containing a keyword receive its category. The longest matching keyword
+                wins.
+            </p>
+        </div>
+        <button
+            mat-stroked-button
+            [disabled]="busy"
+            (click)="applyRules()"
+        >
+            Apply to uncategorized
+        </button>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Description contains</th>
+                    <th>Category</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of rules; track item.id) {
+                    <tr>
+                        <td>{{ item.keyword }}</td>
+                        <td>{{ categoryName(item.categoryId) }}</td>
+                        <td>
+                            <button
+                                class="text-button danger"
+                                [disabled]="busy"
+                                (click)="remove('rules/' + item.id)"
+                            >
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                } @empty {
+                    <tr>
+                        <td
+                            colspan="3"
+                            class="empty"
+                        >
+                            No rules yet. Add a keyword to categorize matching transactions
+                            automatically.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <form
+        #ruleForm="ngForm"
+        (ngSubmit)="saveRule()"
+        class="filters"
+        style="margin-top: 20px"
+    >
+        <input
+            name="keyword"
+            aria-label="Rule keyword"
+            placeholder="e.g. UBER"
+            [(ngModel)]="rule.keyword"
+            required
+            maxlength="200"
+        /><select
+            name="categoryId"
+            aria-label="Rule category"
+            [(ngModel)]="rule.categoryId"
+            required
+        >
+            <option value="">Choose a category</option>
+            @for (item of categories; track item.id) {
+                <option [value]="item.id">{{ item.name }}</option>
+            }</select
+        ><button
+            mat-flat-button
+            [disabled]="ruleForm.invalid || busy"
+        >
+            Add rule
+        </button>
+    </form>
+</section>
+<section class="panel">
+    <h2>Connected sources</h2>
+    <p class="hint">CSV import and manual entry are available now.</p>
+    <div class="form-actions">
+        <button
+            mat-stroked-button
+            disabled
+        >
+            Connect email — Coming soon
+        </button>
+    </div>
+</section>

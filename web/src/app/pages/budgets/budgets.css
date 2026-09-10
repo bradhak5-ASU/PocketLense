@@ -1,0 +1,39 @@
+.budget-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+}
+.budget-card {
+    margin-bottom: 0;
+}
+.budget-amount strong {
+    font-size: 25px;
+    font-weight: 600;
+}
+.budget-amount span {
+    color: var(--muted);
+    font-size: 12px;
+}
+.budget-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    margin: 12px 0 20px;
+}
+mat-progress-bar {
+    --mdc-linear-progress-active-indicator-color: #4b83e6;
+    --mdc-linear-progress-track-color: #edf2f9;
+    border-radius: 4px;
+}
+mat-progress-bar.Warning {
+    --mdc-linear-progress-active-indicator-color: #d9ab54;
+}
+mat-progress-bar.Over {
+    --mdc-linear-progress-active-indicator-color: #dc7873;
+}
+@media (max-width: 850px) {
+    .budget-grid {
+        grid-template-columns: 1fr;
+    }
+}

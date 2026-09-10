@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <PropertyGroup><UserSecretsId>PocketLense-local-development</UserSecretsId></PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="../PocketLense.Infrastructure/PocketLense.Infrastructure.csproj" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.9" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9"><PrivateAssets>all</PrivateAssets></PackageReference>
+        <PackageReference Include="Anthropic" Version="12.47.0" />
+        <PackageReference Include="Microsoft.Extensions.AI" Version="10.10.0" />
+    </ItemGroup>
+</Project>

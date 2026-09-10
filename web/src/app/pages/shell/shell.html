@@ -1,0 +1,45 @@
+<div class="app-layout">
+    <aside class="sidebar">
+        <a
+            class="brand"
+            routerLink="/dashboard"
+            ><span class="brand-mark">P</span>PocketLense<span class="brand-dot">.</span></a
+        >
+        <p class="nav-label">WORKSPACE</p>
+        <nav aria-label="Main navigation">
+            @for (link of links; track link.path) {
+                <a
+                    [routerLink]="link.path"
+                    routerLinkActive="active"
+                    ><span
+                        class="nav-icon"
+                        aria-hidden="true"
+                        >{{ link.icon }}</span
+                    >{{ link.label }}</a
+                >
+            }
+        </nav>
+        <div class="sidebar-bottom">
+            <span class="avatar">{{ auth.email.charAt(0).toUpperCase() }}</span>
+            <div>
+                <strong>Personal account</strong><span class="user-email">{{ auth.email }}</span>
+            </div>
+        </div>
+        <button
+            class="logout"
+            (click)="auth.logout()"
+        >
+            Log out
+        </button>
+    </aside>
+    <div class="workspace">
+        <header class="topbar">
+            <span>Personal workspace</span
+            ><span class="private-label"
+                ><span class="status-dot"></span> Your budget, at a glance</span
+            >
+        </header>
+        <main class="page-content"><router-outlet /></main>
+        <footer class="app-footer">PocketLense <span>All amounts in USD</span></footer>
+    </div>
+</div>

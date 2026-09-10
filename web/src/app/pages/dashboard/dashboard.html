@@ -1,0 +1,261 @@
+<div class="page-heading">
+    <div>
+        <h1>Overview</h1>
+        <p>A little clarity for your everyday finances.</p>
+    </div>
+    <div class="actions">
+        <input
+            class="month-picker"
+            type="month"
+            aria-label="Dashboard month"
+            [(ngModel)]="month"
+            (change)="load()"
+        /><a
+            mat-flat-button
+            routerLink="/transactions"
+            [queryParams]="{ add: 'true' }"
+            >+ Add transaction</a
+        >
+    </div>
+</div>
+@if (error) {
+    <p
+        class="error"
+        role="alert"
+    >
+        {{ error }}
+    </p>
+}
+@if (busy) {
+    <p
+        class="loading"
+        role="status"
+    >
+        Loading your overview…
+    </p>
+}
+@if (data && !busy) {
+    <div class="summary-grid">
+        <section class="summary-card">
+            <span class="summary-label">Total spending</span
+            ><strong class="summary-value">{{ data.comparison.spending | currency }}</strong
+            ><span class="summary-note">
+                @if (data.comparison.percentChange !== null) {
+                    <span
+                        [class.negative]="data.comparison.percentChange > 0"
+                        [class.positive]="data.comparison.percentChange <= 0"
+                        >{{ data.comparison.percentChange > 0 ? '+' : ''
+                        }}{{ data.comparison.percentChange }}%</span
+                    >
+                    vs. last month
+                } @else {
+                    No previous spending to compare
+                }
+            </span>
+        </section>
+        <section class="summary-card">
+            <span class="summary-label">Income this month</span
+            ><strong class="summary-value positive">{{ data.income | currency }}</strong
+            ><span class="summary-note">Income received in the selected month</span>
+        </section>
+        <section class="summary-card">
+            <span class="summary-label">Monthly subscriptions</span
+            ><strong class="summary-value">{{ data.monthlySubscriptions | currency }}</strong
+            ><span class="summary-note">Monthly equivalent of confirmed subscriptions</span>
+        </section>
+    </div>
+    @if (!data.recent.length) {
+        <div class="panel empty">
+            <strong>No transactions yet</strong>Import a statement or add your first transaction.
+            <p><a routerLink="/import">Import a statement →</a></p>
+        </div>
+    }
+    <div class="two-columns">
+        <section class="panel">
+            <div class="panel-heading">
+                <div>
+                    <h2>Spending by category</h2>
+                    <p>Where your money went this month</p>
+                </div>
+            </div>
+            @if (data.categories.length) {
+                <div class="chart">
+                    <canvas
+                        baseChart
+                        type="doughnut"
+                        [data]="donut"
+                        [options]="donutOptions"
+                        aria-label="Spending by category"
+                        role="img"
+                    ></canvas>
+                </div>
+            } @else {
+                <div class="empty">No spending for this month.</div>
+            }
+        </section>
+        <section class="panel">
+            <div class="panel-heading">
+                <div>
+                    <h2>Spending over time</h2>
+                    <p>Your last six months</p>
+                </div>
+                <span class="badge">6 months</span>
+            </div>
+            <div class="chart">
+                <canvas
+                    baseChart
+                    type="bar"
+                    [data]="trend"
+                    [options]="barOptions"
+                    aria-label="Monthly spending over six months"
+                    role="img"
+                ></canvas>
+            </div>
+        </section>
+    </div>
+    <div class="two-columns">
+        <section class="panel">
+            <div class="panel-heading">
+                <div>
+                    <h2>Budget vs. spending</h2>
+                    <p>A check-in on your monthly limits</p>
+                </div>
+                <a routerLink="/budgets">View all →</a>
+            </div>
+            @if (data.budgets.length) {
+                <div class="chart">
+                    <canvas
+                        baseChart
+                        type="bar"
+                        [data]="budgets"
+                        [options]="budgetOptions"
+                        aria-label="Budget limits compared with spending"
+                        role="img"
+                    ></canvas>
+                </div>
+            } @else {
+                <div class="empty">
+                    No budgets set. <a routerLink="/budgets">Set your first limit</a>
+                </div>
+            }
+        </section>
+        <section class="panel">
+            <div class="panel-heading">
+                <div>
+                    <h2>Upcoming renewals</h2>
+                    <p>Due in the next 7 days</p>
+                </div>
+                <a routerLink="/subscriptions">View all →</a>
+            </div>
+            @for (bill of data.upcoming; track bill.id + bill.nextDate) {
+                <div class="bill">
+                    <span class="bill-icon">{{ bill.displayName.charAt(0) }}</span>
+                    <div>
+                        <strong>{{ bill.displayName }}</strong
+                        ><span>{{ bill.nextDate | date: 'MMM d' }}</span>
+                    </div>
+                    <strong class="bill-amount">{{ bill.amount | currency }}</strong>
+                </div>
+            } @empty {
+                <div class="empty">
+                    <strong>Nothing due this week</strong>Your confirmed renewals will appear here.
+                </div>
+            }
+        </section>
+    </div>
+    <section class="panel">
+        <div class="panel-heading">
+            <div>
+                <h2>Recent transactions</h2>
+                <p>The latest activity in your accounts</p>
+            </div>
+            <a routerLink="/transactions">View all →</a>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th class="amount">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (item of data.recent; track item.id) {
+                        <tr>
+                            <td>
+                                <strong>{{ item.description }}</strong>
+                            </td>
+                            <td>
+                                <span class="badge">{{ item.category }}</span>
+                            </td>
+                            <td>{{ item.date | date: 'MMM d, yyyy' }}</td>
+                            <td
+                                class="amount"
+                                [class.positive]="item.amount > 0"
+                                [class.negative]="item.amount < 0"
+                            >
+                                {{ item.amount > 0 ? '+' : '' }}{{ item.amount | currency }}
+                            </td>
+                        </tr>
+                    } @empty {
+                        <tr>
+                            <td
+                                colspan="4"
+                                class="empty"
+                            >
+                                Your recent transactions will appear here.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+}
+
+@if (aiEnabled) {
+    <section class="panel">
+        <h2>Ask PocketLense</h2>
+        <p class="hint">Ask about your spending, budgets, or upcoming renewals.</p>
+        <form
+            #questionForm="ngForm"
+            (ngSubmit)="ask()"
+            class="filters"
+            style="margin-top: 20px"
+        >
+            <input
+                type="search"
+                name="question"
+                aria-label="Question for PocketLense"
+                [(ngModel)]="question"
+                required
+                maxlength="500"
+                placeholder="Where did I spend the most this month?"
+            />
+            <button
+                mat-flat-button
+                [disabled]="questionForm.invalid || asking"
+            >
+                {{ asking ? 'Thinking…' : 'Ask' }}
+            </button>
+        </form>
+        @if (aiError) {
+            <p
+                class="error"
+                role="alert"
+            >
+                {{ aiError }}
+            </p>
+        }
+        @if (answer) {
+            <p
+                aria-live="polite"
+                style="white-space: pre-wrap; line-height: 1.7"
+            >
+                {{ answer }}
+            </p>
+        }
+    </section>
+}

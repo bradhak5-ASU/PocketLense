@@ -1,0 +1,127 @@
+<div class="page-heading">
+    <div>
+        <h1>Budgets</h1>
+        <p>Give each category a little breathing room.</p>
+    </div>
+    <div class="actions">
+        <input
+            type="month"
+            class="month-picker"
+            aria-label="Budget month"
+            [(ngModel)]="month"
+            (change)="load()"
+        /><button
+            mat-stroked-button
+            [disabled]="busy"
+            (click)="copy()"
+        >
+            Copy previous month</button
+        ><button
+            mat-flat-button
+            (click)="edit()"
+        >
+            + Set budget
+        </button>
+    </div>
+</div>
+@if (error) {
+    <p
+        class="error"
+        role="alert"
+    >
+        {{ error }}
+    </p>
+}
+@if (message) {
+    <p class="success">{{ message }}</p>
+}
+@if (editing) {
+    <section class="panel">
+        <h2>Set a monthly limit</h2>
+        <form
+            #form="ngForm"
+            (ngSubmit)="save()"
+        >
+            <div class="form-grid">
+                <label class="form-field"
+                    >Category<select
+                        name="category"
+                        [(ngModel)]="categoryId"
+                        required
+                    >
+                        @for (category of categories; track category.id) {
+                            <option [value]="category.id">{{ category.name }}</option>
+                        }
+                    </select></label
+                ><label class="form-field"
+                    >Monthly limit (USD)<input
+                        name="limit"
+                        type="number"
+                        step="0.01"
+                        min="0.01"
+                        [(ngModel)]="limit"
+                        required
+                /></label>
+            </div>
+            <div class="form-actions">
+                <button
+                    mat-flat-button
+                    [disabled]="form.invalid || busy"
+                >
+                    Save limit</button
+                ><button
+                    mat-stroked-button
+                    type="button"
+                    (click)="editing = false"
+                >
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </section>
+}
+<div class="budget-grid">
+    @for (budget of budgets; track budget.id) {
+        <section class="panel budget-card">
+            <div class="panel-heading">
+                <h2>{{ budget.category }}</h2>
+                <span
+                    class="badge"
+                    [class]="'badge ' + budget.status"
+                    >{{
+                        budget.status === 'OnTrack'
+                            ? 'On track'
+                            : budget.status === 'Over'
+                              ? 'At or over limit'
+                              : 'Near limit'
+                    }}</span
+                >
+            </div>
+            <p class="budget-amount">
+                <strong>{{ budget.spent | currency }}</strong
+                ><span> of {{ budget.limit | currency }}</span>
+            </p>
+            <mat-progress-bar
+                mode="determinate"
+                [value]="budget.percentUsed"
+                [class]="budget.status"
+                [attr.aria-label]="budget.category + ' budget used'"
+            ></mat-progress-bar>
+            <div class="budget-meta">
+                <span>{{ budget.remaining | currency }} remaining</span
+                ><span>{{ budget.percentUsed }}%</span>
+            </div>
+            <button
+                class="text-button"
+                (click)="edit(budget)"
+            >
+                Edit limit
+            </button>
+        </section>
+    } @empty {
+        <section class="panel empty">
+            <strong>No budgets for this month</strong>Set a category limit or copy last month's
+            budgets.
+        </section>
+    }
+</div>

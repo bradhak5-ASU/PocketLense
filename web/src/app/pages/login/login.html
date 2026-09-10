@@ -1,0 +1,74 @@
+<main class="login-page">
+    <section class="login-card">
+        <a
+            class="brand"
+            routerLink="/login"
+            ><span class="brand-mark">P</span>PocketLense<span class="brand-dot">.</span></a
+        >
+        <h1>{{ register ? 'Create your account' : 'Login to continue' }}</h1>
+        <p class="login-intro">
+            {{
+                register
+                    ? 'A clearer view of your everyday spending.'
+                    : 'Your money, all in one place.'
+            }}
+        </p>
+        <form
+            #form="ngForm"
+            (ngSubmit)="submit()"
+        >
+            <label for="email">Email address</label>
+            <input
+                id="email"
+                name="email"
+                type="email"
+                [(ngModel)]="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+                required
+                email
+                maxlength="256"
+            />
+            <label for="password">Password</label>
+            <input
+                id="password"
+                name="password"
+                type="password"
+                [(ngModel)]="password"
+                placeholder="Enter your password"
+                [autocomplete]="register ? 'new-password' : 'current-password'"
+                required
+                minlength="8"
+                maxlength="128"
+            />
+            @if (register) {
+                <p class="hint">
+                    Use 8+ characters, including uppercase, lowercase, a number, and a symbol.
+                </p>
+            }
+            @if (error) {
+                <p
+                    class="error"
+                    role="alert"
+                >
+                    {{ error }}
+                </p>
+            }
+            <button
+                mat-flat-button
+                class="continue-button"
+                type="submit"
+                [disabled]="form.invalid || busy"
+            >
+                {{ busy ? 'Please wait…' : register ? 'Create account' : 'Continue' }}
+            </button>
+        </form>
+        <p class="login-switch">
+            {{ register ? 'Already have an account?' : "Don't have an account?" }}
+            <a [routerLink]="register ? '/login' : '/register'">{{
+                register ? 'Log in' : 'Sign up'
+            }}</a>
+        </p>
+    </section>
+    <p class="login-footer">PocketLense · Personal budget tracker</p>
+</main>

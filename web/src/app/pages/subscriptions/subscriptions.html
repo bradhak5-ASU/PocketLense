@@ -1,0 +1,208 @@
+<div class="page-heading">
+    <div>
+        <h1>Subscriptions</h1>
+        <p>Stay on top of the charges that come around again.</p>
+    </div>
+    <div class="actions">
+        <button
+            mat-stroked-button
+            [disabled]="busy"
+            (click)="action('detect')"
+        >
+            Find recurring charges</button
+        ><button
+            mat-flat-button
+            (click)="editing = true"
+        >
+            + Add subscription
+        </button>
+    </div>
+</div>
+@if (error) {
+    <p
+        class="error"
+        role="alert"
+    >
+        {{ error }}
+    </p>
+}
+<div class="summary-grid">
+    <section class="summary-card">
+        <span class="summary-label">Monthly cost</span
+        ><strong class="summary-value">{{ data.monthlyCost | currency }}</strong
+        ><span class="summary-note">Confirmed subscriptions</span>
+    </section>
+    <section class="summary-card">
+        <span class="summary-label">Annual cost</span
+        ><strong class="summary-value">{{ data.annualCost | currency }}</strong
+        ><span class="summary-note">Annual equivalent</span>
+    </section>
+    <section class="summary-card">
+        <span class="summary-label">Upcoming renewals</span
+        ><strong class="summary-value">{{ data.upcoming.length }}</strong
+        ><span class="summary-note">In the next 30 days</span>
+    </section>
+</div>
+@if (editing) {
+    <section class="panel">
+        <h2>Add a subscription</h2>
+        <form
+            #entry="ngForm"
+            (ngSubmit)="save()"
+        >
+            <div class="form-grid">
+                <label class="form-field"
+                    >Name<input
+                        name="name"
+                        [(ngModel)]="form.displayName"
+                        required
+                        maxlength="200" /></label
+                ><label class="form-field"
+                    >Amount (USD)<input
+                        name="amount"
+                        type="number"
+                        step="0.01"
+                        min="0.01"
+                        [(ngModel)]="form.amount"
+                        required /></label
+                ><label class="form-field"
+                    >Frequency<select
+                        name="frequency"
+                        [(ngModel)]="form.frequency"
+                    >
+                        <option>Weekly</option>
+                        <option>Monthly</option>
+                        <option>Annual</option>
+                    </select></label
+                ><label class="form-field"
+                    >Next renewal<input
+                        name="nextDate"
+                        type="date"
+                        [(ngModel)]="form.nextDate"
+                        required
+                /></label>
+            </div>
+            <div class="form-actions">
+                <button
+                    mat-flat-button
+                    [disabled]="entry.invalid || busy"
+                >
+                    Save subscription</button
+                ><button
+                    mat-stroked-button
+                    type="button"
+                    (click)="editing = false"
+                >
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </section>
+}
+<section class="panel">
+    <div class="panel-heading">
+        <h2>Your subscriptions</h2>
+        <label
+            ><input
+                type="checkbox"
+                [(ngModel)]="showDismissed"
+            />
+            Show dismissed</label
+        >
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Frequency</th>
+                    <th>Status</th>
+                    <th class="amount">Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of data.items; track item.id) {
+                    @if (item.status !== 'Dismissed' || showDismissed) {
+                        <tr>
+                            <td>
+                                <strong>{{ item.displayName }}</strong>
+                                @if (item.previousAmount) {
+                                    <p class="hint negative">
+                                        Price increased from {{ item.previousAmount | currency }}
+                                    </p>
+                                }
+                            </td>
+                            <td>{{ item.frequency }}</td>
+                            <td>
+                                <span class="badge">{{ item.status }}</span>
+                            </td>
+                            <td class="amount">{{ item.amount | currency }}</td>
+                            <td>
+                                @if (item.status !== 'Confirmed') {
+                                    <button
+                                        class="text-button"
+                                        [disabled]="busy"
+                                        (click)="action(item.id + '/confirm')"
+                                    >
+                                        Confirm
+                                    </button>
+                                }
+                                @if (item.status !== 'Dismissed') {
+                                    <button
+                                        class="text-button danger"
+                                        [disabled]="busy"
+                                        (click)="action(item.id + '/dismiss')"
+                                    >
+                                        Dismiss
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                } @empty {
+                    <tr>
+                        <td
+                            colspan="5"
+                            class="empty"
+                        >
+                            No subscriptions yet. Add one or import a few months of transactions.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+<section class="panel">
+    <h2>Due in the next 30 days</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Subscription</th>
+                    <th>Renewal date</th>
+                    <th class="amount">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (bill of data.upcoming; track bill.id + bill.nextDate) {
+                    <tr>
+                        <td>{{ bill.displayName }}</td>
+                        <td>{{ bill.nextDate | date: 'MMM d, yyyy' }}</td>
+                        <td class="amount">{{ bill.amount | currency }}</td>
+                    </tr>
+                } @empty {
+                    <tr>
+                        <td
+                            colspan="3"
+                            class="empty"
+                        >
+                            No confirmed renewals in the next 30 days.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

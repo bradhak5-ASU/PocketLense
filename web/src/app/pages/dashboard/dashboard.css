@@ -1,0 +1,39 @@
+.chart {
+    height: 225px;
+    position: relative;
+}
+.panel-heading a {
+    font-size: 11px;
+    white-space: nowrap;
+}
+.bill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+}
+.bill:last-child {
+    border: 0;
+}
+.bill-icon {
+    width: 36px;
+    height: 36px;
+    background: #f0f4fb;
+    color: #7891b9;
+    display: grid;
+    place-items: center;
+    border-radius: 7px;
+}
+.bill strong {
+    font-size: 12px;
+}
+.bill div span {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 5px;
+}
+.bill-amount {
+    margin-left: auto;
+}

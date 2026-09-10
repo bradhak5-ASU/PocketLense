@@ -1,0 +1,279 @@
+<div class="page-heading">
+    <div>
+        <h1>Transactions</h1>
+        <p>Your everyday income and spending.</p>
+    </div>
+    <div class="actions">
+        <a
+            mat-stroked-button
+            routerLink="/import"
+            >Import CSV</a
+        ><button
+            mat-flat-button
+            (click)="edit()"
+        >
+            + Add transaction
+        </button>
+    </div>
+</div>
+@if (error) {
+    <p
+        class="error"
+        role="alert"
+    >
+        {{ error }}
+    </p>
+}
+@if (message) {
+    <p
+        class="success"
+        role="status"
+    >
+        {{ message }}
+    </p>
+}
+@if (editing) {
+    <section class="panel">
+        <h2>{{ form.id ? 'Edit transaction' : 'Add transaction' }}</h2>
+        <form
+            #entry="ngForm"
+            (ngSubmit)="save()"
+        >
+            <div class="form-grid">
+                <label class="form-field"
+                    >Description<input
+                        name="description"
+                        [(ngModel)]="form.description"
+                        required
+                        maxlength="500"
+                        placeholder="e.g. Grocery run"
+                /></label>
+                <label class="form-field"
+                    >Amount (USD)<input
+                        name="amount"
+                        type="number"
+                        step="0.01"
+                        [(ngModel)]="form.amount"
+                        required
+                    /><span class="hint"
+                        >Use a negative amount for spending, positive for income.</span
+                    ></label
+                >
+                <label class="form-field"
+                    >Date<input
+                        name="date"
+                        type="date"
+                        [(ngModel)]="form.date"
+                        required
+                /></label>
+                <label class="form-field"
+                    >Account<select
+                        name="account"
+                        [(ngModel)]="form.accountId"
+                        required
+                    >
+                        @for (account of accounts; track account.id) {
+                            <option [value]="account.id">{{ account.name }}</option>
+                        }
+                    </select></label
+                >
+                <label class="form-field"
+                    >Category<select
+                        name="category"
+                        [(ngModel)]="form.categoryId"
+                    >
+                        <option [ngValue]="null">Apply matching rule / Uncategorized</option>
+                        @for (category of categories; track category.id) {
+                            <option [value]="category.id">{{ category.name }}</option>
+                        }
+                    </select></label
+                >
+            </div>
+            @if (form.categoryId) {
+                <p>
+                    <label
+                        ><input
+                            name="makeRule"
+                            type="checkbox"
+                            [(ngModel)]="makeRule"
+                        />
+                        Always categorize similar descriptions this way</label
+                    >
+                </p>
+                @if (makeRule) {
+                    <label class="form-field"
+                        >Description contains<input
+                            name="keyword"
+                            [(ngModel)]="ruleKeyword"
+                            required
+                            maxlength="200"
+                            placeholder="e.g. UBER"
+                    /></label>
+                }
+            }
+            <div class="form-actions">
+                <button
+                    mat-flat-button
+                    type="submit"
+                    [disabled]="entry.invalid || saving || form.amount === 0"
+                >
+                    {{ saving ? 'Saving…' : 'Save transaction' }}</button
+                ><button
+                    mat-stroked-button
+                    type="button"
+                    (click)="editing = false"
+                >
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </section>
+}
+@if (deleteId) {
+    <section class="panel">
+        <h2>Delete this transaction?</h2>
+        <p class="hint">This removes it from your spending and budget totals.</p>
+        <div class="form-actions">
+            <button
+                mat-flat-button
+                [disabled]="saving"
+                (click)="remove()"
+            >
+                Delete transaction</button
+            ><button
+                mat-stroked-button
+                (click)="deleteId = ''"
+            >
+                Cancel
+            </button>
+        </div>
+    </section>
+}
+<section class="panel">
+    <form
+        class="filters"
+        (ngSubmit)="load(true)"
+    >
+        <input
+            name="search"
+            type="search"
+            placeholder="Search descriptions…"
+            aria-label="Search descriptions"
+            [(ngModel)]="search"
+        /><input
+            name="month"
+            type="month"
+            aria-label="Transaction month"
+            [(ngModel)]="month"
+        /><select
+            name="accountFilter"
+            aria-label="Filter account"
+            [(ngModel)]="accountId"
+        >
+            <option value="">All accounts</option>
+            @for (account of accounts; track account.id) {
+                <option [value]="account.id">{{ account.name }}</option>
+            }</select
+        ><select
+            name="categoryFilter"
+            aria-label="Filter category"
+            [(ngModel)]="categoryId"
+        >
+            <option value="">All categories</option>
+            @for (category of categories; track category.id) {
+                <option [value]="category.id">{{ category.name }}</option>
+            }</select
+        ><button
+            mat-stroked-button
+            type="submit"
+        >
+            Apply filters
+        </button>
+    </form>
+    @if (loading) {
+        <p class="loading">Loading transactions…</p>
+    }
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Account</th>
+                    <th class="amount">Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of items; track item.id) {
+                    <tr>
+                        <td>{{ item.date | date: 'MMM d' }}</td>
+                        <td>
+                            <strong>{{ item.description }}</strong>
+                        </td>
+                        <td>
+                            <select
+                                [attr.aria-label]="'Category for ' + item.description"
+                                [ngModel]="item.categoryId || ''"
+                                (ngModelChange)="changeCategory(item, $event)"
+                            >
+                                <option value="">Uncategorized</option>
+                                @for (category of categories; track category.id) {
+                                    <option [value]="category.id">{{ category.name }}</option>
+                                }
+                            </select>
+                        </td>
+                        <td>{{ accountName(item.accountId) }}</td>
+                        <td
+                            class="amount"
+                            [class.positive]="item.amount > 0"
+                            [class.negative]="item.amount < 0"
+                        >
+                            {{ item.amount > 0 ? '+' : '' }}{{ item.amount | currency }}
+                        </td>
+                        <td>
+                            <button
+                                class="text-button"
+                                (click)="edit(item)"
+                            >
+                                Edit</button
+                            ><button
+                                class="text-button danger"
+                                (click)="deleteId = item.id"
+                            >
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                } @empty {
+                    <tr>
+                        <td
+                            colspan="6"
+                            class="empty"
+                        >
+                            No transactions found. Add a transaction or import a statement.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination">
+        <span>{{ total }} transactions</span
+        ><button
+            class="text-button"
+            [disabled]="page === 1 || loading"
+            (click)="page = page - 1; load()"
+        >
+            Previous</button
+        ><span>Page {{ page }}</span
+        ><button
+            class="text-button"
+            [disabled]="page * 20 >= total || loading"
+            (click)="page = page + 1; load()"
+        >
+            Next
+        </button>
+    </div>
+</section>

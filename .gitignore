@@ -1,0 +1,20 @@
+bin/
+obj/
+node_modules/
+web/dist/
+web/.angular/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.user
+.demo-login.txt
+
+# Local credentials and database backups
+secrets.json
+*.pfx
+*.p12
+*.key
+*.pem
+*.dump
+*.sql

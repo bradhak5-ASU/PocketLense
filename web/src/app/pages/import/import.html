@@ -1,0 +1,221 @@
+<div class="page-heading">
+    <div>
+        <h1>Import a statement</h1>
+        <p>Bring your bank transactions into PocketLense.</p>
+    </div>
+    <a
+        mat-stroked-button
+        routerLink="/transactions"
+        >View transactions</a
+    >
+</div>
+@if (error) {
+    <p
+        class="error"
+        role="alert"
+    >
+        {{ error }}
+    </p>
+}
+<section class="panel">
+    <h2>1. Choose your CSV</h2>
+    <p class="hint">Export a CSV statement from your bank. Maximum file size: 5 MB.</p>
+    <div
+        class="form-grid"
+        style="margin-top: 20px"
+    >
+        <label class="form-field"
+            >Statement file<input
+                type="file"
+                accept=".csv,text/csv"
+                (change)="choose($event)" /></label
+        ><label class="form-field"
+            >Import into<select [(ngModel)]="accountId">
+                @for (account of accounts; track account.id) {
+                    <option [value]="account.id">{{ account.name }}</option>
+                }
+            </select></label
+        >
+    </div>
+    <div class="form-actions">
+        <button
+            mat-flat-button
+            [disabled]="!file || busy || !accountId"
+            (click)="preview()"
+        >
+            {{ busy ? 'Please wait…' : 'Preview statement' }}
+        </button>
+    </div>
+</section>
+@if (headers.length) {
+    <section class="panel">
+        <h2>2. Match the columns</h2>
+        <p class="hint">Choose which columns contain your date, description, and amounts.</p>
+        <form
+            #form="ngForm"
+            (ngSubmit)="commit()"
+        >
+            <div
+                class="form-grid"
+                style="margin-top: 20px"
+            >
+                <label class="form-field"
+                    >Date column<select
+                        name="dateColumn"
+                        [(ngModel)]="mapping.dateColumn"
+                        required
+                    >
+                        <option value="">Choose column</option>
+                        @for (header of headers; track header) {
+                            <option>{{ header }}</option>
+                        }
+                    </select></label
+                >
+                <label class="form-field"
+                    >Date format<select
+                        name="dateFormat"
+                        [(ngModel)]="mapping.dateFormat"
+                    >
+                        <option value="MM/dd/yyyy">MM/dd/yyyy (09/10/2026)</option>
+                        <option value="M/d/yyyy">M/d/yyyy (9/10/2026)</option>
+                        <option value="yyyy-MM-dd">yyyy-MM-dd (2026-09-10)</option>
+                        <option value="dd/MM/yyyy">dd/MM/yyyy (10/09/2026)</option>
+                    </select></label
+                >
+                <label class="form-field"
+                    >Description column<select
+                        name="descriptionColumn"
+                        [(ngModel)]="mapping.descriptionColumn"
+                        required
+                    >
+                        <option value="">Choose column</option>
+                        @for (header of headers; track header) {
+                            <option>{{ header }}</option>
+                        }
+                    </select></label
+                >
+                <label class="form-field"
+                    >Amount layout<select
+                        name="amountMode"
+                        [(ngModel)]="amountMode"
+                    >
+                        <option value="single">One amount column</option>
+                        <option value="split">Separate debit / credit columns</option>
+                    </select></label
+                >
+                @if (amountMode === 'single') {
+                    <label class="form-field"
+                        >Amount column<select
+                            name="amountColumn"
+                            [(ngModel)]="mapping.amountColumn"
+                            required
+                        >
+                            <option value="">Choose column</option>
+                            @for (header of headers; track header) {
+                                <option>{{ header }}</option>
+                            }
+                        </select></label
+                    >
+                } @else {
+                    <label class="form-field"
+                        >Debit column<select
+                            name="debitColumn"
+                            [(ngModel)]="mapping.debitColumn"
+                            required
+                        >
+                            <option value="">Choose column</option>
+                            @for (header of headers; track header) {
+                                <option>{{ header }}</option>
+                            }
+                        </select></label
+                    >
+                    <label class="form-field"
+                        >Credit column<select
+                            name="creditColumn"
+                            [(ngModel)]="mapping.creditColumn"
+                            required
+                        >
+                            <option value="">Choose column</option>
+                            @for (header of headers; track header) {
+                                <option>{{ header }}</option>
+                            }
+                        </select></label
+                    >
+                }
+            </div>
+            <p>
+                <label
+                    ><input
+                        type="checkbox"
+                        name="invertSign"
+                        [(ngModel)]="mapping.invertSign"
+                    />
+                    Invert signs (if your bank shows spending as positive)</label
+                >
+            </p>
+            <div class="form-actions">
+                <button
+                    mat-flat-button
+                    [disabled]="form.invalid || busy || !accountId"
+                >
+                    Import transactions
+                </button>
+            </div>
+        </form>
+    </section>
+    <section class="panel">
+        <div class="panel-heading">
+            <h2>Preview</h2>
+            <span class="hint">First {{ rows.length }} rows</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        @for (header of headers; track header) {
+                            <th>{{ header }}</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (row of rows; track $index) {
+                        <tr>
+                            @for (cell of row; track $index) {
+                                <td>{{ cell }}</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+}
+@if (result) {
+    <section
+        class="panel"
+        aria-live="polite"
+    >
+        <h2>
+            {{
+                result.errors.length
+                    ? 'Nothing imported — fix these rows and try again'
+                    : 'Import complete'
+            }}
+        </h2>
+        <p class="hint">
+            {{ result.imported }} imported · {{ result.skippedDuplicates }} duplicates skipped
+        </p>
+        @for (error of result.errors; track $index) {
+            <p class="error">Row {{ error.row }}: {{ error.reason }}</p>
+        }
+        @if (!result.errors.length) {
+            <div class="form-actions">
+                <a
+                    mat-flat-button
+                    routerLink="/transactions"
+                    >View transactions</a
+                >
+            </div>
+        }
+    </section>
+}
