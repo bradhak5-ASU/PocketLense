@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { ApiService } from '../../services/api.service';
@@ -18,6 +18,7 @@ interface Message {
 })
 export class AssistantPage {
     private api = inject(ApiService);
+    private changeDetector = inject(ChangeDetectorRef);
     @ViewChild('chatEnd') chatEnd?: ElementRef<HTMLDivElement>;
     question = '';
     busy = false;
@@ -45,9 +46,19 @@ export class AssistantPage {
         if (!question || this.busy) return;
         this.messages.push({ role: 'user', text: question });
         this.question = '';
-        this.busy = true;
         this.error = '';
         this.scroll();
+
+        if (['hi', 'hello', 'hey'].includes(question.toLowerCase())) {
+            this.messages.push({
+                role: 'assistant',
+                text: 'Hi! Ask me about your spending, budgets, income, or recurring charges.',
+            });
+            this.scroll();
+            return;
+        }
+
+        this.busy = true;
         try {
             const data = await this.api.get<Dashboard>('dashboard?month=' + currentMonth());
             this.messages.push({ role: 'assistant', text: this.answer(question, data) });
@@ -55,6 +66,7 @@ export class AssistantPage {
             this.error = this.api.error(error);
         } finally {
             this.busy = false;
+            this.changeDetector.detectChanges();
             this.scroll();
         }
     }
