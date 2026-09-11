@@ -34,10 +34,21 @@
     </aside>
     <div class="workspace">
         <header class="topbar">
-            <span>Personal workspace</span
-            ><span class="private-label"
-                ><span class="status-dot"></span> Your budget, at a glance</span
-            >
+            <span class="workspace-label">Personal workspace</span>
+            <div class="topbar-actions">
+                <span class="private-label"
+                    ><span class="status-dot"></span> Your budget, at a glance</span
+                >
+                <button
+                    mat-stroked-button
+                    class="refresh-button"
+                    type="button"
+                    aria-label="Refresh PocketLense data"
+                    (click)="refresh()"
+                >
+                    <span aria-hidden="true">↻</span> Refresh
+                </button>
+            </div>
         </header>
         <main class="page-content"><router-outlet /></main>
         <footer class="app-footer">PocketLense <span>All amounts in USD</span></footer>

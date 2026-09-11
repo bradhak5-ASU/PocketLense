@@ -1,11 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
 
 @Component({
     selector: 'app-shell',
-    imports: [RouterLink, RouterLinkActive, RouterOutlet],
+    imports: [RouterLink, RouterLinkActive, RouterOutlet, MatButtonModule],
     templateUrl: './shell.html',
     styleUrl: './shell.css',
 })
@@ -27,5 +28,9 @@ export class Shell implements OnInit {
         } catch {
             // I let the page show the connection error.
         }
+    }
+
+    refresh(): void {
+        window.location.reload();
     }
 }

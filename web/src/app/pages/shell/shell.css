@@ -115,6 +115,19 @@ nav a.active {
     color: var(--muted);
     font-size: 11px;
 }
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+.refresh-button {
+    color: var(--nav-text) !important;
+    border-color: var(--border) !important;
+}
+.refresh-button span {
+    margin-right: 5px;
+    font-size: 16px;
+}
 .status-dot {
     width: 6px;
     height: 6px;
@@ -170,8 +183,16 @@ nav a.active {
     }
     .nav-label,
     .sidebar-bottom,
-    .nav-icon,
+    .nav-icon {
+        display: none;
+    }
     .topbar {
+        height: 54px;
+        padding: 0 16px;
+        justify-content: flex-end;
+    }
+    .workspace-label,
+    .private-label {
         display: none;
     }
     .logout {
