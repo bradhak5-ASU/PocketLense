@@ -1,0 +1,10 @@
+.git
+.github
+.env
+**/bin
+**/obj
+**/node_modules
+frontend/.angular
+frontend/dist
+tests
+docs

@@ -12,6 +12,7 @@ using PocketLense.Infrastructure.Services;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
+builder.Services.AddHealthChecks();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddIdentityCore<IdentityUser>(options =>
 {
@@ -74,6 +75,13 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
 app.MapControllers();
+app.MapHealthChecks("/health");
+if (app.Configuration.GetValue<bool>("Database:MigrateOnStart"))
+{
+    using var scope = app.Services.CreateScope();
+    var database = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await database.Database.MigrateAsync();
+}
 if (app.Environment.IsDevelopment() && args.Contains("--seed-demo"))
 {
     using var scope = app.Services.CreateScope();

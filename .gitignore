@@ -1,8 +1,8 @@
 bin/
 obj/
 node_modules/
-web/dist/
-web/.angular/
+frontend/dist/
+frontend/.angular/
 .env
 .env.*
 !.env.example

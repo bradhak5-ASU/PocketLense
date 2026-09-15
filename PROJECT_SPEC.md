@@ -29,14 +29,14 @@ Do not use `Anthropic.SDK` or `tryAGI.Anthropic` — they are unofficial. Pin al
 
 ```
 pocketlense/
-├── src/
+├── backend/
 │   ├── PocketLense.Api/             controllers, auth, DI setup, Program.cs
 │   ├── PocketLense.Core/            entities, interfaces, business logic (no EF, no web)
 │   └── PocketLense.Infrastructure/  EF Core DbContext, migrations, AI client, transaction sources
 ├── tests/
 │   ├── PocketLense.Tests.Unit/
 │   └── PocketLense.Tests.Integration/
-├── web/                       Angular app
+├── frontend/                  Angular app and Nginx configuration
 ├── docker-compose.yml
 ├── README.md                  short: what the project is and how to run it
 └── PROJECT_SPEC.md            this file
@@ -70,7 +70,7 @@ Every user-owned table has a `UserId` column, and every query filters by the cur
 | **Account** | Id, UserId, Name, Type (`Checking`, `Credit`, `Savings`) |
 | **Category** | Id, UserId, Name, Kind (`Expense`, `Income`, `Transfer`) |
 | **CategoryRule** | Id, UserId, Keyword, CategoryId |
-| **Transaction** | Id, UserId, AccountId, Date, Description, Amount, CategoryId (nullable), Source (`Manual`, `Csv`, `Email`), ImportHash (nullable), CreatedAt |
+| **Transaction** | Id, UserId, AccountId, Date, Description, Amount, CategoryId (nullable), Source (`Manual`, `Csv`, `Excel`, `Pdf`), ImportHash (nullable), CreatedAt |
 | **Budget** | Id, UserId, CategoryId, Month (first day of month, `DateOnly`), Limit |
 | **Subscription** | Id, UserId, MerchantKey, DisplayName, Amount, PreviousAmount (nullable), Frequency (`Weekly`, `Monthly`, `Annual`), NextDate, Status (`Detected`, `Confirmed`, `Dismissed`), IsManual |
 
@@ -115,7 +115,7 @@ Unique index on `(UserId, ImportHash)` where `ImportHash` is not null. Unique in
 **Requirements**
 - Accept CSV, Excel (`.xls` and `.xlsx`), and text-based PDF statements. Scanned PDFs are not supported yet.
 - Two-step flow:
-  1. `POST /api/imports/preview` — upload CSV (max 5 MB). Returns detected headers and the first 20 rows.
+  1. `POST /api/imports/preview` — upload a supported statement (max 5 MB). Returns detected headers and the first 20 rows.
   2. `POST /api/imports/commit` — same file plus a column mapping and target account.
 - Mapping options: date column + date format, description column, and either a single amount column **or** separate debit/credit columns, plus an "invert sign" toggle (credit card exports often flip signs).
 - Import is all-or-nothing for parse errors: if any row fails to parse, nothing is saved and the response lists row numbers and reasons.

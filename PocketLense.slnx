@@ -1,8 +1,8 @@
 <Solution>
-  <Folder Name="/src/">
-    <Project Path="src/PocketLense.Api/PocketLense.Api.csproj" />
-    <Project Path="src/PocketLense.Core/PocketLense.Core.csproj" />
-    <Project Path="src/PocketLense.Infrastructure/PocketLense.Infrastructure.csproj" />
+  <Folder Name="/backend/">
+    <Project Path="backend/PocketLense.Api/PocketLense.Api.csproj" />
+    <Project Path="backend/PocketLense.Core/PocketLense.Core.csproj" />
+    <Project Path="backend/PocketLense.Infrastructure/PocketLense.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/PocketLense.Tests.Integration/PocketLense.Tests.Integration.csproj" />
